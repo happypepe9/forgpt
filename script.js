@@ -13,27 +13,41 @@ function addTodo() {
     if (text === '') return;
 
     const todos = JSON.parse(localStorage.getItem('todos')) || [];
-    todos.push(text);
+    const item = {
+        id: Date.now(),
+        text
+    };
+    todos.push(item);
     localStorage.setItem('todos', JSON.stringify(todos));
 
-    addTodoItem(text);
+    addTodoItem(item);
     input.value = '';
 }
 
-function addTodoItem(text) {
+function addTodoItem(item) {
     const list = document.getElementById('todo-list');
     const li = document.createElement('li');
     li.className = 'todo-item';
-    li.innerHTML = '<span>' + text + '</span> <button onclick="removeTodo(this)">x</button>';
+    li.dataset.id = item.id;
+
+    const span = document.createElement('span');
+    span.textContent = item.text;
+
+    const button = document.createElement('button');
+    button.textContent = 'x';
+    button.addEventListener('click', removeTodo);
+
+    li.appendChild(span);
+    li.appendChild(button);
     list.appendChild(li);
 }
 
-function removeTodo(button) {
-    const li = button.parentElement;
-    const text = li.querySelector('span').textContent;
+function removeTodo(event) {
+    const li = event.target.parentElement;
+    const id = li.dataset.id;
 
     let todos = JSON.parse(localStorage.getItem('todos')) || [];
-    todos = todos.filter(t => t !== text);
+    todos = todos.filter(t => String(t.id) !== id);
     localStorage.setItem('todos', JSON.stringify(todos));
 
     li.remove();
